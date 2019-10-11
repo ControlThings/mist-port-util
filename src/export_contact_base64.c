@@ -38,20 +38,20 @@ static void base64_print_formatted(uint8_t *raw_doc, size_t raw_doc_len) {
 }
 
 static void identity_export_cb(struct wish_rpc_entry* req, void* ctx, const uint8_t* data, size_t data_len) {
-    bson_visit("identity_export_cb", data);
+    //bson_visit("identity_export_cb", data);
 
     bson_iterator it;
 
     BSON_ITERATOR_FROM_BUFFER(&it, data);
     bson_find_fieldpath_value("data.data", &it);
-    bson_visit("Contact data.data", (const uint8_t*) bson_iterator_bin_data(&it));
+    //bson_visit("Contact data.data", (const uint8_t*) bson_iterator_bin_data(&it));
 
     BSON_ITERATOR_FROM_BUFFER(&it, data);
     bson_find_fieldpath_value("data", &it);
     if (bson_iterator_type(&it) == BSON_OBJECT) {
     	bson export_bs;
     	bson_iterator_subobject(&it, &export_bs);
-    	bson_visit("data doc", (const uint8_t*) bson_data(&export_bs));
+    	//bson_visit("data doc", (const uint8_t*) bson_data(&export_bs));
 
     	WISHDEBUG(LOG_CRITICAL, "Here is the the local contact card, base64 encoded:");
 
@@ -80,10 +80,10 @@ void identity_export_base64(mist_app_t *mist_app, uint8_t local_uid[WISH_ID_LEN]
 }
 
 static void core_list_identities_cb(struct wish_rpc_entry* req, void* ctx, const uint8_t* data, size_t data_len) {
-    bson_visit("core_list_identities_cb", data);
+    //bson_visit("core_list_identities_cb", data);
     uint8_t local_uid[WISH_ID_LEN];
 
-    mist_app_t *mist_app = ctx;
+    mist_app_t *mist_app = req->cb_context; //This ist the mist_app passed as parameter to wish_app_request() in generate_contact_card_base64(). Note that 'ctx' is not the same context!
 
     bson_iterator it;
     BSON_ITERATOR_FROM_BUFFER(&it, data);
@@ -110,5 +110,5 @@ void generate_contact_card_base64(mist_app_t *mist_app) {
     bson_append_finish_array(&bs);
     bson_append_int(&bs, "id", 0);
     bson_finish(&bs);
-    wish_app_request(mist_app->app,  &bs, core_list_identities_cb, NULL);
+    wish_app_request(mist_app->app,  &bs, core_list_identities_cb, mist_app);
 }
