@@ -16,6 +16,7 @@
  */
 
 #include <string.h>
+#include <inttypes.h>
 #include "wish_debug.h"
 #include "app_util.h"
 #include "bson.h"
